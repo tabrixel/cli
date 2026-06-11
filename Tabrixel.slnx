@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Tabrixel.Tests/Tabrixel.Tests.csproj" />
+  <Project Path="Tabrixel/Tabrixel.csproj" />
+</Solution>
