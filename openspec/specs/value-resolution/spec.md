@@ -56,7 +56,7 @@ For commands that operate on a single sheet, the sheet name SHALL resolve as: `-
 - **THEN** the overview covers all sheets of the document, not only `Data`
 
 ### Requirement: Source diagnostics in auth check
-The `auth check` command SHALL report, for each of the three keys, the resolved value (for credentials: the path, never key contents) and its source — flag, env, project config, global config, or none — and SHALL report the resolved project and global `config.toml` paths with whether each file was found. The diagnostics SHALL appear in both text and JSON output.
+The `auth check` command SHALL report, for each of the three keys, the resolved value (for credentials: the path, never key contents) and its source — flag, env, project config, global config, or none — and SHALL report the resolved project and global `config.toml` paths with whether each file was found. The diagnostics SHALL appear in both text and JSON output. In both formats the diagnostics SHALL be grouped into a value group (the three keys) and a config-file group (project and global `config.toml`); in JSON these groups appear as nested `values` and `configs` objects under `sources`.
 
 #### Scenario: Sources shown per value
 - **WHEN** `auth check` runs with `--spreadsheet-id` passed as a flag, credentials coming from `GOOGLE_APPLICATION_CREDENTIALS`, and `sheet` coming from the project config
@@ -64,4 +64,4 @@ The `auth check` command SHALL report, for each of the three keys, the resolved 
 
 #### Scenario: Diagnostics in JSON
 - **WHEN** `auth check --output json` runs
-- **THEN** the JSON payload includes the per-key sources and config file paths in snake_case
+- **THEN** the JSON payload's `sources` object contains a `values` object with the per-key resolved values and sources (`spreadsheet_id`, `sheet`, `credentials`) and a `configs` object with the project and global `config.toml` paths and found flags, all property names in snake_case

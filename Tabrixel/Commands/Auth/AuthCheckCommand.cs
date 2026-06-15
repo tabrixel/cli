@@ -72,11 +72,13 @@ public class AuthCheckCommand : CliCommandAsync<GlobalSettings>
                           ?? ConfigLocator.DefaultProjectPath(Directory.GetCurrentDirectory());
 
         return new SourceDiagnostics(
-            new ValueDiagnostic(spreadsheetId.Value, spreadsheetId.Source),
-            new ValueDiagnostic(sheet.Value, sheet.Source),
-            new ValueDiagnostic(credentials.Value, credentials.Source),
-            new ConfigFileDiagnostic(projectPath, resolver.ProjectConfig is not null),
-            new ConfigFileDiagnostic(resolver.GlobalConfig.FilePath, resolver.GlobalConfig.Exists));
+            new ValueSources(
+                new ValueDiagnostic(spreadsheetId.Value, spreadsheetId.Source),
+                new ValueDiagnostic(sheet.Value, sheet.Source),
+                new ValueDiagnostic(credentials.Value, credentials.Source)),
+            new ConfigSources(
+                new ConfigFileDiagnostic(projectPath, resolver.ProjectConfig is not null),
+                new ConfigFileDiagnostic(resolver.GlobalConfig.FilePath, resolver.GlobalConfig.Exists)));
     }
 
     private static void RenderSources(IAnsiConsole console, SourceDiagnostics sources)
@@ -85,15 +87,15 @@ public class AuthCheckCommand : CliCommandAsync<GlobalSettings>
         {
             Justification = Justify.Left
         });
-        RenderFile(console, "Project", sources.ProjectConfig);
-        RenderFile(console, "Global", sources.GlobalConfig);
+        RenderFile(console, "Project", sources.Configs.Project);
+        RenderFile(console, "Global", sources.Configs.Global);
         console.Write(new Rule("[yellow]Values[/]")
         {
             Justification = Justify.Left
         });
-        RenderValue(console, "spreadsheet-id", sources.SpreadsheetId);
-        RenderValue(console, "sheet", sources.Sheet);
-        RenderValue(console, "credentials", sources.Credentials);
+        RenderValue(console, "spreadsheet-id", sources.Values.SpreadsheetId);
+        RenderValue(console, "sheet", sources.Values.Sheet);
+        RenderValue(console, "credentials", sources.Values.Credentials);
     }
 
     private static void RenderValue(IAnsiConsole console, string name, ValueDiagnostic value) =>
@@ -109,12 +111,18 @@ public class AuthCheckCommand : CliCommandAsync<GlobalSettings>
 
     private record ConfigFileDiagnostic(string Path, bool Found);
 
-    private record SourceDiagnostics(
+    private record ValueSources(
         ValueDiagnostic SpreadsheetId,
         ValueDiagnostic Sheet,
-        ValueDiagnostic Credentials,
-        ConfigFileDiagnostic ProjectConfig,
-        ConfigFileDiagnostic GlobalConfig);
+        ValueDiagnostic Credentials);
+
+    private record ConfigSources(
+        ConfigFileDiagnostic Project,
+        ConfigFileDiagnostic Global);
+
+    private record SourceDiagnostics(
+        ValueSources Values,
+        ConfigSources Configs);
 
     private record Payload(
         string ServiceAccountEmail,
