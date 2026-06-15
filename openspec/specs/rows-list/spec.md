@@ -29,7 +29,7 @@ The command SHALL accept repeatable `--where 'Column=value'` conditions combined
 - **THEN** the command fails with `ColumnNotFound` suggesting `Status`
 
 ### Requirement: Limiting with --limit
-`--limit N` SHALL return at most the first N (matching) records and SHALL default to 100 when not specified. A non-positive `--limit` SHALL fail with `InvalidArguments`.
+`--limit N` SHALL return at most the first N (matching) records remaining after `--offset` is applied, and SHALL default to 100 when not specified. A non-positive `--limit` SHALL fail with `InvalidArguments`.
 
 #### Scenario: Default limit applied
 - **WHEN** `tbxl rows list <id>` is run without `--limit` against a sheet with 250 data rows
@@ -39,8 +39,35 @@ The command SHALL accept repeatable `--where 'Column=value'` conditions combined
 - **WHEN** `--where` matches 5 records and `--limit 2` is passed
 - **THEN** the first 2 matching records are returned and `total` reports 5
 
+#### Scenario: Limit applied after offset
+- **WHEN** `--where` matches 10 records and `--offset 2 --limit 3` is passed
+- **THEN** at most 3 records are returned, starting from the 3rd match
+
 #### Scenario: Invalid limit
 - **WHEN** `--limit 0` is passed
+- **THEN** the command fails with `InvalidArguments`
+
+### Requirement: Skipping with --offset
+`--offset N` SHALL skip the first N matching records before `--limit` is applied; it SHALL default to `0` (skip nothing) when not specified. A negative `--offset` SHALL fail with `InvalidArguments`. The skip SHALL apply after `--where` filtering and before `--limit`, so the effective window is the records from position N up to N + the limit. The `total` field SHALL continue to report the count of records matching `--where` before `--offset` and `--limit` are applied, so a caller can detect remaining pages. An offset at or beyond the matched count SHALL yield empty output and exit code 0.
+
+#### Scenario: Offset skips leading records
+- **WHEN** `--where` matches 10 records and `--offset 3` is passed without `--limit`
+- **THEN** records starting at the 4th match are returned and `total` reports 10
+
+#### Scenario: Offset combined with limit pages the result
+- **WHEN** `--where` matches 10 records and `--offset 2 --limit 3` is passed
+- **THEN** the 3rd, 4th, and 5th matching records are returned and `total` reports 10
+
+#### Scenario: Offset beyond matches
+- **WHEN** `--where` matches 4 records and `--offset 4` (or larger) is passed
+- **THEN** the command outputs an empty result and exits 0
+
+#### Scenario: Default offset preserves current behavior
+- **WHEN** `--offset` is not passed
+- **THEN** no records are skipped, identical to listing without offset
+
+#### Scenario: Negative offset
+- **WHEN** `--offset -1` is passed
 - **THEN** the command fails with `InvalidArguments`
 
 ### Requirement: Column projection with --columns

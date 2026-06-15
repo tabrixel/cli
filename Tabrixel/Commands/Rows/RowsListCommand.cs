@@ -9,11 +9,7 @@ public class RowsListCommand : CliCommand<RowsListSettings>
 {
     protected override ExitCodes ExecuteCommand(CommandContext context, RowsListSettings settings, CancellationToken cancellationToken)
     {
-        if (settings.Limit < 1)
-        {
-            throw new CliException(ErrorCode.InvalidArguments,
-                $"--limit must be a positive integer, got {settings.Limit}");
-        }
+        RowWindow.Validate(settings.Offset, settings.Limit);
 
         var columnNames = settings.Columns is { } rawColumns ? ParseColumns(rawColumns) : null;
 
@@ -25,19 +21,16 @@ public class RowsListCommand : CliCommand<RowsListSettings>
         var header = spreadsheet.LoadHeader(sheet);
         var values = spreadsheet.LoadValues(sheet);
 
-        // The filter applies before --limit (the limit caps already-matched
-        // records); total is the matched count before the limit, so a caller
-        // can tell a truncated result from a complete one. Zero matches are
-        // valid data: empty output, exit code 0 — exit code 2 "0 rows
-        // affected" belongs to mutations.
+        // Paging order is --where → --offset → --limit; total is the matched
+        // count before offset and limit, so a caller can tell a truncated or
+        // partial page from a complete result. Zero matches are valid data:
+        // empty output, exit code 0 — exit code 2 "0 rows affected" belongs to
+        // mutations.
         IReadOnlyList<int> matched = settings.Where is { Length: > 0 } rawConditions
             ? WhereMatcher.Match(header, values, rawConditions.Select(WhereCondition.Parse).ToList())
             : Enumerable.Range(1, Math.Max(0, values.Count - 1)).ToList();
         var total = matched.Count;
-        if (matched.Count > settings.Limit)
-        {
-            matched = matched.Take(settings.Limit).ToList();
-        }
+        matched = RowWindow.Apply(matched, settings.Offset, settings.Limit);
 
         // --where validates against the full header above, so filtering on a
         // column not selected for output is allowed.

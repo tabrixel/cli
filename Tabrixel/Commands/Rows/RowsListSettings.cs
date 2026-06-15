@@ -11,6 +11,13 @@ public class RowsListSettings : SpreadsheetSettings
                  "Repeatable; multiple conditions are combined with AND. 'Column=' matches empty cells.")]
     public string[]? Where { get; set; }
 
+    [CommandOption("--offset <N>")]
+    [Description("Skip the first N matching records before --limit is applied (default 0). " +
+                 "Combine with --limit to page through results; the 'total' field reports the " +
+                 "matched count before the offset.")]
+    [DefaultValue(0)]
+    public int Offset { get; set; }
+
     [CommandOption("--limit <N>")]
     [Description("Return at most N first records (default 100). The 'total' field in the " +
                  "response reports how many records matched before the limit.")]

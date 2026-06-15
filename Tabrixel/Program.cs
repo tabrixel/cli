@@ -44,22 +44,25 @@ app.Configure(config =>
 
     config.AddBranch("rows", rows =>
     {
-        rows.SetDescription("Work with sheet rows as records.");
+        rows.SetDescription("Work with sheet rows as records");
 
         rows.AddCommand<RowsListCommand>("list")
-            .WithDescription("Read rows below the header as records.");
+            .WithDescription("Read rows below the header as records")
+            .WithExample("rows", "list", "--limit", "10")
+            .WithExample("rows", "list", "--offset", "10", "--limit", "10")
+            .WithExample("rows", "list", "--where", "Status=Done", "--columns", "Name,Status");
 
         rows.AddCommand<RowsAddCommand>("add")
-            .WithDescription("Add one record; values are laid out by column names from --json.");
+            .WithDescription("Add one record; values are laid out by column names from --json");
 
         rows.AddCommand<RowsUpdateCommand>("update")
-            .WithDescription("Update fields of rows matched by --where; --set assigns new column values.");
+            .WithDescription("Update fields of rows matched by --where; --set assigns new column values");
 
         rows.AddCommand<RowsUpsertCommand>("upsert")
-            .WithDescription("Update rows matched by --where with --json fields, or insert a new record when nothing matches.");
+            .WithDescription("Update rows matched by --where with --json fields, or insert a new record when nothing matches");
 
         rows.AddCommand<RowsDeleteCommand>("delete")
-            .WithDescription("Delete rows matched by --where; requires --yes.");
+            .WithDescription("Delete rows matched by --where; requires --yes");
     });
     
 #if DEBUG
