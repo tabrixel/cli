@@ -9,18 +9,15 @@ using Tabrixel.Sheets;
 
 namespace Tabrixel.Commands.Auth;
 
-public class AuthCheckCommand : CliCommand<GlobalSettings>
+public class AuthCheckCommand : CliCommandAsync<GlobalSettings>
 {
-    protected override ExitCodes ExecuteCommand(CommandContext context, GlobalSettings settings, CancellationToken cancellationToken)
+    protected override async Task<ExitCodes> ExecuteCommand(CommandContext context, GlobalSettings settings, CancellationToken cancellationToken)
     {
         var client = SheetsServiceFactory.Create(settings);
 
         try
         {
-            ((ITokenAccess)client.Credential)
-                .GetAccessTokenForRequestAsync(cancellationToken: cancellationToken)
-                .GetAwaiter()
-                .GetResult();
+            await ((ITokenAccess)client.Credential).GetAccessTokenForRequestAsync(cancellationToken: cancellationToken);
         }
         catch (TokenResponseException ex)
         {
@@ -37,7 +34,7 @@ public class AuthCheckCommand : CliCommand<GlobalSettings>
             {
                 var request = client.Service.Spreadsheets.Get(spreadsheetId.Value);
                 request.Fields = "spreadsheetId";
-                request.Execute();
+                await request.ExecuteAsync(cancellationToken);
             }
             catch (GoogleApiException ex)
             {
@@ -51,7 +48,11 @@ public class AuthCheckCommand : CliCommand<GlobalSettings>
         Renderer.Data(result,
             console =>
             {
-                console.MarkupLine($"[green]✓[/] service account: [blue]{Markup.Escape(result.ServiceAccountEmail)}[/]");
+                console.Write(new Rule("[yellow]Result[/]") 
+                {
+                    Justification = Justify.Left
+                });
+                console.MarkupLine($"[green]✓[/] Service account: [blue]{Markup.Escape(result.ServiceAccountEmail)}[/]");
                 console.MarkupLine(!string.IsNullOrEmpty(result.SpreadsheetId)
                     ? $"[green]✓[/] spreadsheet accessible: [blue]{Markup.Escape(result.SpreadsheetId)}[/]"
                     : "[yellow]![/] spreadsheet not provided, add [yellow]--spreadsheet-id <ID>[/]");
@@ -80,21 +81,28 @@ public class AuthCheckCommand : CliCommand<GlobalSettings>
 
     private static void RenderSources(IAnsiConsole console, SourceDiagnostics sources)
     {
-        console.MarkupLine("sources:");
+        console.Write(new Rule("[yellow]Configs[/]")
+        {
+            Justification = Justify.Left
+        });
+        RenderFile(console, "Project", sources.ProjectConfig);
+        RenderFile(console, "Global", sources.GlobalConfig);
+        console.Write(new Rule("[yellow]Values[/]")
+        {
+            Justification = Justify.Left
+        });
         RenderValue(console, "spreadsheet-id", sources.SpreadsheetId);
         RenderValue(console, "sheet", sources.Sheet);
         RenderValue(console, "credentials", sources.Credentials);
-        RenderFile(console, "project config", sources.ProjectConfig);
-        RenderFile(console, "global config", sources.GlobalConfig);
     }
 
     private static void RenderValue(IAnsiConsole console, string name, ValueDiagnostic value) =>
         console.MarkupLine(value.Source == ValueSource.None
             ? $"  {name} [grey](not set)[/]"
-            : $"  {name} ← {value.Source.Label()}: [blue]{Markup.Escape(value.Value ?? string.Empty)}[/]");
+            : $"  {name}: [blue]{Markup.Escape(value.Value ?? string.Empty)}[/] [green]({value.Source.Label()})[/]");
 
     private static void RenderFile(IAnsiConsole console, string label, ConfigFileDiagnostic file) =>
-        console.MarkupLine($"  {label}: {Markup.Escape(file.Path)} " +
+        console.MarkupLine($"  {label}: [blue]{Markup.Escape(file.Path)}[/] " +
                            (file.Found ? "[green](found)[/]" : "[grey](not found)[/]"));
 
     private record ValueDiagnostic(string? Value, ValueSource Source);
