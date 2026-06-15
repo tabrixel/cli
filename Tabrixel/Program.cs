@@ -21,16 +21,19 @@ app.Configure(config =>
 
     config.AddBranch("config", cfg =>
     {
-        cfg.SetDescription("Manage default values stored in .tabrixel/config.toml (project or global).");
+        cfg.SetDescription("Manage default values stored in .tabrixel/config.toml (project or global)");
 
         cfg.AddCommand<ConfigSetCommand>("set")
-            .WithDescription("Set a config key in the project config, or in ~/.tabrixel with --global.");
+            .WithDescription("Set a config key in the project config, or in ~/.tabrixel with --global")
+            .WithExample("config", "set", "credentials", "~/path/to/key.json")
+            .WithExample("config", "set", "spreadsheet-id", "1234567890")
+            .WithExample("config", "set", "sheet", "Sheet1");
 
         cfg.AddCommand<ConfigGetCommand>("get")
-            .WithDescription("Show the effective config value of a key (project overrides global).");
+            .WithDescription("Show the effective config value of a key (project overrides global)");
 
         cfg.AddCommand<ConfigListCommand>("list")
-            .WithDescription("Show all config keys with values, scopes, and config file paths.");
+            .WithDescription("Show all config keys with values, scopes, and config file paths");
     });
 
     config.AddCommand<DescribeCommand>("describe")
@@ -58,6 +61,12 @@ app.Configure(config =>
         rows.AddCommand<RowsDeleteCommand>("delete")
             .WithDescription("Delete rows matched by --where; requires --yes.");
     });
+    
+#if DEBUG
+    // Development-only settings
+    config.PropagateExceptions();
+    config.ValidateExamples();
+#endif
 });
 
 return app.Run(args);
