@@ -56,11 +56,22 @@ public sealed class ConfigFile
 
     public void Save()
     {
-        if (Path.GetDirectoryName(FilePath) is { Length: > 0 } directory)
+        try
         {
-            Directory.CreateDirectory(directory);
-        }
+            if (Path.GetDirectoryName(FilePath) is { Length: > 0 } directory)
+            {
+                Directory.CreateDirectory(directory);
+            }
 
-        File.WriteAllText(FilePath, TomlSerializer.Serialize(_table));
+            File.WriteAllText(FilePath, TomlSerializer.Serialize(_table));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // A write failure (no permission, full disk, read-only path) is an
+            // expected, user-facing error — surface it as such, not as Internal.
+            throw new CliException(ErrorCode.IOError,
+                $"failed to write config to {FilePath}: {ex.Message}",
+                new Dictionary<string, object?> { ["path"] = FilePath });
+        }
     }
 }

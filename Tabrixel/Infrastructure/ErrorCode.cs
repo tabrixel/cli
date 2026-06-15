@@ -10,5 +10,6 @@ public enum ErrorCode
     ColumnNotFound,
     AmbiguousMatch,
     ConfirmationRequired,
-    InvalidArguments
+    InvalidArguments,
+    IOError
 }

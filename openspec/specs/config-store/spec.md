@@ -37,7 +37,7 @@ The CLI SHALL support two config locations: a project config at `.tabrixel/confi
 - **THEN** the project value is used
 
 ### Requirement: config set command
-The CLI SHALL provide `tbxl config set <key> <value>` writing one key to the project config by default: into the discovered project config if one exists up the tree, otherwise into a newly created `.tabrixel/config.toml` in the current working directory (creating the `.tabrixel` directory). With `--global`, the CLI SHALL write to `~/.tabrixel/config.toml` instead, creating the directory and file as needed. Setting an unknown key SHALL fail with `invalid_arguments`.
+The CLI SHALL provide `tbxl config set <key> <value>` writing one key to the project config by default: into the discovered project config if one exists up the tree, otherwise into a newly created `.tabrixel/config.toml` in the current working directory (creating the `.tabrixel` directory). With `--global`, the CLI SHALL write to `~/.tabrixel/config.toml` instead, creating the directory and file as needed. Setting an unknown key SHALL fail with `invalid_arguments`. When persisting the config fails for a filesystem reason — the target directory or file cannot be created or written (e.g. insufficient permissions or a full disk) — the command SHALL fail with an `io_error` whose message describes the failure and whose details name the config file path, rather than surfacing as an internal error with a raw exception message.
 
 #### Scenario: First project write creates the file
 - **WHEN** no `.tabrixel/config.toml` exists anywhere up the tree and the user runs `tbxl config set spreadsheet-id 1AbC`
@@ -54,6 +54,10 @@ The CLI SHALL provide `tbxl config set <key> <value>` writing one key to the pro
 #### Scenario: Unknown key rejected
 - **WHEN** the user runs `tbxl config set color red`
 - **THEN** the command fails with an `invalid_arguments` error listing the supported keys
+
+#### Scenario: Write failure reported as io_error
+- **WHEN** the user runs `tbxl config set spreadsheet-id 1AbC` but the config file's directory cannot be created or the file cannot be written (e.g. no write permission or a full disk)
+- **THEN** the command fails with an `io_error` whose message describes the write failure and whose details include the config file path, not an `internal` error with a raw exception message
 
 ### Requirement: config get command
 The CLI SHALL provide `tbxl config get <key>` printing the merged config-level value (project overriding global) together with the scope it came from. Flags and environment variables SHALL NOT be consulted. When the key is set in neither config file, the command SHALL fail with a `not_found` error.
