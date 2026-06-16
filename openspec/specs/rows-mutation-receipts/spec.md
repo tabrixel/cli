@@ -17,11 +17,11 @@ Wherever a mutation payload reports a row number (`row` fields of receipts), the
 When a mutation affects more than 50 rows, the `rows` receipt array SHALL contain only the first 50 affected rows in selection order. Payloads carrying a `rows` array MUST always include `truncated` (boolean, `true` only when rows were cut) and `returned` (the number of elements actually present in `rows`), in both truncated and non-truncated outcomes, so the payload schema is stable. `matched` and `affected` SHALL keep counting all rows regardless of truncation.
 
 #### Scenario: Mass mutation is truncated
-- **WHEN** `rows update … --all --output json` affects 320 rows
+- **WHEN** `rows update … --all --json` affects 320 rows
 - **THEN** stdout contains `"affected": 320`, a `rows` array of 50 elements, `"truncated": true`, and `"returned": 50`
 
 #### Scenario: Small mutation keeps the stable schema
-- **WHEN** a mutation affects 2 rows with `--output json`
+- **WHEN** a mutation affects 2 rows with `--json`
 - **THEN** the payload contains a `rows` array of 2 elements, `"truncated": false`, and `"returned": 2`
 
 ### Requirement: Column names in receipts are verbatim

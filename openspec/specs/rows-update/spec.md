@@ -36,14 +36,14 @@ When the conditions match 0 rows the command SHALL write a warning to stderr, wr
 - **THEN** stderr carries a warning, stdout carries no affected-result, and the exit code is 2
 
 ### Requirement: Mutation result output
-On success the command SHALL report the affected count and a receipt of the affected rows. With `--output json`, stdout carries a payload with `matched`, `affected`, `dry_run`, a `rows` array, and the `truncated`/`returned` fields defined by `rows-mutation-receipts`. Each `rows` element SHALL carry `row` (1-based sheet row number per `rows-mutation-receipts`) plus `before` and `after` objects containing exactly the union of the columns assigned by `--set` and the columns referenced by `--where`, in header column order — not the full record. `before` SHALL hold the cell values from the pre-write snapshot; `after` the values as written (a cleared cell appears as `""`). Text output SHALL print the confirmation message plus a per-row summary of the same receipt (row number, `before` → `after` per assigned column), capped by the same truncation rule.
+On success the command SHALL report the affected count and a receipt of the affected rows. With `--json`, stdout carries a payload with `matched`, `affected`, `dry_run`, a `rows` array, and the `truncated`/`returned` fields defined by `rows-mutation-receipts`. Each `rows` element SHALL carry `row` (1-based sheet row number per `rows-mutation-receipts`) plus `before` and `after` objects containing exactly the union of the columns assigned by `--set` and the columns referenced by `--where`, in header column order — not the full record. `before` SHALL hold the cell values from the pre-write snapshot; `after` the values as written (a cleared cell appears as `""`). Text output SHALL print the confirmation message plus a per-row summary of the same receipt (row number, `before` → `after` per assigned column), capped by the same truncation rule.
 
 #### Scenario: JSON result carries before/after
-- **WHEN** `tbxl rows update <id> --where 'Email=a@b.c' --set 'Status=Done' --output json` matches one row at sheet row 5 whose `Status` was `Open`
+- **WHEN** `tbxl rows update <id> --where 'Email=a@b.c' --set 'Status=Done' --json` matches one row at sheet row 5 whose `Status` was `Open`
 - **THEN** stdout contains `"affected": 1` and a `rows` element with `"row": 5`, `before` of `{"Email": "a@b.c", "Status": "Open"}`, and `after` of `{"Email": "a@b.c", "Status": "Done"}`
 
 #### Scenario: Cleared cell in after
-- **WHEN** an update with `--set 'Status='` succeeds with `--output json`
+- **WHEN** an update with `--set 'Status='` succeeds with `--json`
 - **THEN** the matched row's `after` object contains `"Status": ""`
 
 #### Scenario: Unassigned columns are not in the receipt

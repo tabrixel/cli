@@ -4,7 +4,7 @@ using Tabrixel.Infrastructure;
 
 namespace Tabrixel.Commands.Rows;
 
-public class RowsListSettings : SpreadsheetSettings
+public class RowsListSettings : PositionalSpreadsheetSettings
 {
     [CommandOption("--where <CONDITION>")]
     [Description("Filter records by exact match 'Column=value' (case-sensitive, no type coercion). " +

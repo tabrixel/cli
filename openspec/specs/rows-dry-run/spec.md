@@ -7,10 +7,10 @@ Previewing mutating row commands (`rows add`, `rows update`, `rows delete`, `row
 ## Requirements
 
 ### Requirement: Mutating commands accept --dry-run
-The commands `rows add`, `rows update`, `rows delete`, and `rows upsert` SHALL accept a `--dry-run` flag. When set, the command MUST perform all reads and validation exactly as a real run — resolve the sheet, load and validate the header, parse `--json`/`--set`/`--where`, and match rows — but MUST NOT issue any write request to the Google Sheets API.
+The commands `rows add`, `rows update`, `rows delete`, and `rows upsert` SHALL accept a `--dry-run` flag. When set, the command MUST perform all reads and validation exactly as a real run — resolve the sheet, load and validate the header, parse the JSON record/`--set`/`--where`, and match rows — but MUST NOT issue any write request to the Google Sheets API.
 
 #### Scenario: rows add dry run writes nothing
-- **WHEN** `tbxl rows add <id> --json '{"Name":"John"}' --dry-run` is executed against a sheet with a valid header
+- **WHEN** `tbxl rows add '{"Name":"John"}' --dry-run` is executed against a sheet with a valid header
 - **THEN** no append request is sent to the API, and the command exits with code 0
 
 #### Scenario: rows update dry run writes nothing
@@ -22,22 +22,22 @@ The commands `rows add`, `rows update`, `rows delete`, and `rows upsert` SHALL a
 - **THEN** no delete request is sent to the API, and the command exits with code 0
 
 #### Scenario: rows upsert dry run writes nothing
-- **WHEN** `tbxl rows upsert <id> --where 'Email=a@b.c' --json '{"Name":"John"}' --dry-run` is executed against a sheet with a valid header
+- **WHEN** `tbxl rows upsert --where 'Email=a@b.c' '{"Name":"John"}' --dry-run` is executed against a sheet with a valid header
 - **THEN** neither an update nor an append request is sent to the API, and the command exits with code 0
 
 #### Scenario: validation errors still fail in dry run
-- **WHEN** a mutating command is executed with `--dry-run` and invalid input (e.g. unknown column in `--set`, malformed `--json`, broken header)
+- **WHEN** a mutating command is executed with `--dry-run` and invalid input (e.g. unknown column in `--set`, malformed JSON record, broken header)
 - **THEN** the command fails with the same error code and message as a real run
 
 ### Requirement: Dry-run output reports the would-be effect
 A dry run SHALL report the same affected-row count and the same receipt fields the real run would have produced: the payload shape is identical to the real run's so previews can be diffed against actual results. The JSON payload MUST include a `dry_run` field (`true` on dry runs, `false` on real runs); for `rows update`/`rows delete` it MUST also include the `matched` field defined by `rows-match-reporting` and the `rows`/`truncated`/`returned` receipt fields defined by `rows-mutation-receipts`, where `before`/`after` (update) show what *would* change and `data` (delete) what *would* be removed. For `rows add`, `row` MUST hold the predicted append position. Text output MUST use "Would …" phrasing instead of past tense.
 
 #### Scenario: JSON output marks dry run
-- **WHEN** `tbxl rows update … --dry-run --output json` matches 3 rows
+- **WHEN** `tbxl rows update … --dry-run --json` matches 3 rows
 - **THEN** stdout contains `"matched": 3`, `"affected": 3`, `"dry_run": true`, and a `rows` array of 3 receipt elements with `before`/`after`
 
 #### Scenario: dry-run delete carries the would-be receipts
-- **WHEN** `tbxl rows delete … --all --dry-run --output json` matches 2 rows
+- **WHEN** `tbxl rows delete … --all --dry-run --json` matches 2 rows
 - **THEN** stdout contains a `rows` array with the 2 records under `data`, and no delete request is sent
 
 #### Scenario: text output uses conditional phrasing
@@ -45,18 +45,18 @@ A dry run SHALL report the same affected-row count and the same receipt fields t
 - **THEN** the message reads "Would delete 2 record(s) …" rather than "Deleted 2 record(s) …"
 
 #### Scenario: real runs keep a stable schema
-- **WHEN** a mutating command runs without `--dry-run` and `--output json`
+- **WHEN** a mutating command runs without `--dry-run` and `--json`
 - **THEN** the payload contains `"dry_run": false` and the same receipt fields as the dry run
 
 ### Requirement: Dry run preserves exit-code semantics
-A dry run SHALL exit with the same code the real run would have: `Success` (0) when the write would happen, `NoMatch` (2) when `--where` matches zero rows for `rows update`/`rows delete`. With `--output json`, the zero-match case MUST additionally emit the payload `{"matched": 0, "affected": 0, "dry_run": true, "rows": [], "truncated": false, "returned": 0}` on stderr per `rows-match-reporting`.
+A dry run SHALL exit with the same code the real run would have: `Success` (0) when the write would happen, `NoMatch` (2) when `--where` matches zero rows for `rows update`/`rows delete`. With `--json`, the zero-match case MUST additionally emit the payload `{"matched": 0, "affected": 0, "dry_run": true, "rows": [], "truncated": false, "returned": 0}` on stderr per `rows-match-reporting`.
 
 #### Scenario: zero matches in dry run
 - **WHEN** `tbxl rows delete <id> --where 'Status=Nope' --all --dry-run` matches no rows with text output
 - **THEN** a warning is written to stderr and the command exits with code 2
 
 #### Scenario: zero matches in dry run with JSON output
-- **WHEN** `tbxl rows delete <id> --where 'Status=Nope' --all --dry-run --output json` matches no rows
+- **WHEN** `tbxl rows delete <id> --where 'Status=Nope' --all --dry-run --json` matches no rows
 - **THEN** stderr contains `"matched": 0`, `"affected": 0`, `"dry_run": true`, and `"rows": []`, stdout is empty, and the command exits with code 2
 
 ### Requirement: rows delete dry run does not require --yes

@@ -53,13 +53,15 @@ app.Configure(config =>
             .WithExample("rows", "list", "--where", "Status=Done", "--columns", "Name,Status");
 
         rows.AddCommand<RowsAddCommand>("add")
-            .WithDescription("Add one record; values are laid out by column names from --json");
+            .WithDescription("Add one record; values are laid out by column names from the JSON record argument")
+            .WithExample("rows", "add", "{\"Name\":\"John\",\"Age\":30}");
 
         rows.AddCommand<RowsUpdateCommand>("update")
             .WithDescription("Update fields of rows matched by --where; --set assigns new column values");
 
         rows.AddCommand<RowsUpsertCommand>("upsert")
-            .WithDescription("Update rows matched by --where with --json fields, or insert a new record when nothing matches");
+            .WithDescription("Update rows matched by --where with the JSON record's fields, or insert a new record when nothing matches")
+            .WithExample("rows", "upsert", "--where", "Email=a@b.c", "{\"Status\":\"Done\"}");
 
         rows.AddCommand<RowsDeleteCommand>("delete")
             .WithDescription("Delete rows matched by --where; requires --yes");

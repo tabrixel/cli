@@ -9,12 +9,13 @@ public class RowsUpsertCommand : CliCommand<RowsUpsertSettings>
 {
     protected override ExitCodes ExecuteCommand(CommandContext context, RowsUpsertSettings settings, CancellationToken cancellationToken)
     {
-        // --json and --where are required as domain errors rendered per
-        // --output, not as Spectre parse-error text.
+        // The JSON record and --where are required as domain errors rendered per
+        // the output format, not as Spectre parse-error text.
         if (settings.Json is null)
         {
             throw new CliException(ErrorCode.InvalidArguments,
-                "--json is required: pass the fields as a JSON object, e.g. --json '{\"Name\":\"John\"}'");
+                "JSON record is required: pass it as the first argument, " +
+                "e.g. rows upsert --where 'Email=a@b.c' '{\"Status\":\"Done\"}'");
         }
 
         // Without --where every data row matches and upsert degenerates into a
@@ -31,10 +32,10 @@ public class RowsUpsertCommand : CliCommand<RowsUpsertSettings>
 
         var sheet = spreadsheet.ResolveSheet(settings.ResolveSheetName().Value);
         // A broken header fails the command (HeaderInvalid) before any write:
-        // --where/--json column names resolve only against a valid header.
+        // --where/record column names resolve only against a valid header.
         var header = spreadsheet.LoadHeader(sheet);
 
-        // Both inputs are validated (including the --where/--json conflict
+        // Both inputs are validated (including the --where/record conflict
         // check) before reading values or writing anything.
         var jsonRow = JsonRecordParser.Parse(settings.Json, header);
         var jsonColumns = JsonColumns(settings.Json, header);
@@ -48,7 +49,7 @@ public class RowsUpsertCommand : CliCommand<RowsUpsertSettings>
         if (selected.Count == 0)
         {
             // Insert path: the new row is the union of the --where key values
-            // and the --json fields (overlaps are equal by the check above).
+            // and the record fields (overlaps are equal by the check above).
             var row = jsonRow.ToArray();
             foreach (var condition in conditions)
             {
@@ -76,7 +77,7 @@ public class RowsUpsertCommand : CliCommand<RowsUpsertSettings>
         }
 
         // Index i in values corresponds to sheet row i + 1 (A1: header is row 1).
-        // Only the --json-provided columns are rewritten.
+        // Only the record-provided columns are rewritten.
         var updates = selected
             .SelectMany(i => jsonColumns.Select(c => new CellUpdate(c, i + 1, jsonRow[c])))
             .ToList();
@@ -85,7 +86,7 @@ public class RowsUpsertCommand : CliCommand<RowsUpsertSettings>
             spreadsheet.UpdateCells(sheet, updates);
         }
 
-        // Same receipt shape as rows update: --json fields play the role of
+        // Same receipt shape as rows update: record fields play the role of
         // --set assignments, --where keys identify the record.
         var receipts = MutationReceipt.BuildUpdateReceipts(
             header, values, selected,
@@ -109,7 +110,7 @@ public class RowsUpsertCommand : CliCommand<RowsUpsertSettings>
     }
 
     /// <summary>
-    /// Column indices of the fields actually present in --json. JsonRecordParser
+    /// Column indices of the fields actually present in the record. JsonRecordParser
     /// returns a full-width row (absent fields as ""), but an update must touch
     /// only the provided columns, so the field set is re-derived from the
     /// already-validated document.
@@ -123,8 +124,8 @@ public class RowsUpsertCommand : CliCommand<RowsUpsertSettings>
     }
 
     /// <summary>
-    /// A column referenced by both --where and --json must carry the same cell
-    /// value (compared after --json scalar conversion); a different value is
+    /// A column referenced by both --where and the record must carry the same
+    /// cell value (compared after scalar conversion); a different value is
     /// contradictory — there is no single record both inputs describe. Two
     /// --where conditions on one column with different values are rejected for
     /// the same reason: no row (including the inserted one) could ever match,
@@ -154,7 +155,7 @@ public class RowsUpsertCommand : CliCommand<RowsUpsertSettings>
             {
                 throw new CliException(ErrorCode.InvalidArguments,
                     $"column '{column.Name}' has conflicting values in --where ('{condition.Value}') " +
-                    $"and --json ('{jsonRow[column.Index]}')");
+                    $"and the JSON record ('{jsonRow[column.Index]}')");
             }
         }
     }

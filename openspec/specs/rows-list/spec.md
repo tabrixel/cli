@@ -90,10 +90,10 @@ The command SHALL accept `--columns <NAME,NAME,...>` (comma-separated, exact cas
 - **THEN** the command fails with `InvalidArguments`
 
 ### Requirement: Dual output format
-With `--output json` the command SHALL emit to stdout exactly one JSON object with two fields: `rows` — an array of record objects (record per row, keys = selected column names verbatim) — and `total` — the number of records matching the `--where` filter (all records when no filter) before `--limit` is applied. With text output it SHALL render a table with one column per selected header column, followed by a summary line reporting the returned record count and `total`.
+With `--json` the command SHALL emit to stdout exactly one JSON object with two fields: `rows` — an array of record objects (record per row, keys = selected column names verbatim) — and `total` — the number of records matching the `--where` filter (all records when no filter) before `--limit` is applied. With text output it SHALL render a table with one column per selected header column, followed by a summary line reporting the returned record count and `total`.
 
 #### Scenario: JSON output
-- **WHEN** `tbxl rows list <id> --output json` is run
+- **WHEN** `tbxl rows list <id> --json` is run
 - **THEN** stdout contains exactly one JSON object with a `rows` array of flat string-valued objects and an integer `total`
 
 #### Scenario: Truncation is detectable

@@ -9,12 +9,13 @@ public class RowsAddCommand : CliCommand<RowsAddSettings>
 {
     protected override ExitCodes ExecuteCommand(CommandContext context, RowsAddSettings settings, CancellationToken cancellationToken)
     {
-        // --json is required as a domain error rendered per --output, not as
-        // Spectre parse-error text (consistent with RequireSpreadsheetId).
+        // The JSON record is required as a domain error rendered per the output
+        // format, not as Spectre parse-error text (consistent with
+        // RequireSpreadsheetId), so the positional argument stays optional.
         if (settings.Json is null)
         {
             throw new CliException(ErrorCode.InvalidArguments,
-                "--json is required: pass the record as a JSON object, e.g. --json '{\"Name\":\"John\"}'");
+                "JSON record is required: pass it as the first argument, e.g. rows add '{\"Name\":\"John\"}'");
         }
 
         var spreadsheetId = settings.RequireSpreadsheetId();

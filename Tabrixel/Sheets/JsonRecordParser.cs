@@ -5,8 +5,9 @@ using Tabrixel.Infrastructure;
 namespace Tabrixel.Sheets;
 
 /// <summary>
-/// Parses the --json value for rows add: a JSON object mapping column names to
-/// values becomes a cell row laid out by header column indices. Strict mode:
+/// Parses the JSON record argument for rows add/upsert: a JSON object mapping
+/// column names to values becomes a cell row laid out by header column indices.
+/// Strict mode:
 /// shape errors (invalid JSON, non-object, empty object, duplicate field, nested
 /// values) → InvalidArguments; an unknown field name → ColumnNotFound.
 /// </summary>
@@ -115,5 +116,5 @@ public static class JsonRecordParser
     };
 
     private static CliException Invalid(string reason) => new(ErrorCode.InvalidArguments,
-        $"invalid --json value: {reason}; expected a JSON object like '{{\"Column\":\"value\"}}'");
+        $"invalid JSON record: {reason}; expected a JSON object like '{{\"Column\":\"value\"}}'");
 }

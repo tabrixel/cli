@@ -1,6 +1,6 @@
 # Tabrixel
 
-**Tabrixel** (`tbxl`) is a command-line tool for working with Google Sheets as record tables: inspect a document's structure, read rows as records, and add, update, upsert, or delete rows by column-based conditions. Output is human-readable text or machine-parseable JSON.
+**Tabrixel** (`tbxl`) is a command-line tool for working with Google Sheets as record tables: inspect a document's structure, read rows as records, and add, update, upsert, or delete rows by column-based conditions. Output is human-readable text by default, or machine-parseable JSON (snake_case properties, data on stdout, errors on stderr) when the global `--json` flag is passed.
 
 ## Installation
 
@@ -17,7 +17,7 @@ dotnet tool install --global Tabrixel
 - **tbxl describe** — Overview of the document: sheets, columns, and record counts
 - **tbxl columns** — List column names of the target sheet
 - **tbxl rows list** — Read rows below the header as records
-- **tbxl rows add** — Add one record from `--json`
+- **tbxl rows add** — Add one record from a JSON object argument (`tbxl rows add '{"Name":"John"}'`)
 - **tbxl rows update** — Update fields of rows matched by `--where`
 - **tbxl rows upsert** — Update matched rows, or insert a new record when nothing matches
 - **tbxl rows delete** — Delete rows matched by `--where` (requires `--yes`)

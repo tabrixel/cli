@@ -23,7 +23,7 @@ The CLI SHALL provide a `describe` command that reports, for each sheet of the d
 
 #### Scenario: Missing spreadsheet ID
 - **WHEN** neither the positional argument nor `--spreadsheet-id` is provided
-- **THEN** the command fails with `InvalidArguments` rendered per `--output` (exit code 1)
+- **THEN** the command fails with `InvalidArguments` rendered per the output format (exit code 1)
 
 ### Requirement: Invalid header does not fail describe
 A sheet whose first row is an invalid header (empty, gaps before the last non-empty cell, or duplicate names) SHALL be reported inline with a `HeaderInvalid` error entry instead of failing the whole command; the command SHALL still exit 0.
@@ -33,8 +33,8 @@ A sheet whose first row is an invalid header (empty, gaps before the last non-em
 - **THEN** that sheet's entry carries the `HeaderInvalid` code and message, other sheets are described normally, and the exit code is 0
 
 ### Requirement: Dual output format
-With `--output json` the command SHALL emit a single JSON document `{"spreadsheet_id": ..., "sheets": [{"name", "columns", "records"} | {"name", "error": {"code", "message", ...}}]}` to stdout; with the default text output it SHALL render a table with Sheet/Records/Columns columns.
+With `--json` the command SHALL emit a single JSON document `{"spreadsheet_id": ..., "sheets": [{"name", "columns", "records"} | {"name", "error": {"code", "message", ...}}]}` to stdout; with the default text output it SHALL render a table with Sheet/Records/Columns columns.
 
 #### Scenario: JSON output
-- **WHEN** `tbxl describe <id> --output json` is run
+- **WHEN** `tbxl describe <id> --json` is run
 - **THEN** stdout contains exactly one JSON document with `spreadsheet_id` and a `sheets` array

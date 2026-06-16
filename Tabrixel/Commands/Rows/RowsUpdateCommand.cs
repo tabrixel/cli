@@ -9,7 +9,7 @@ public class RowsUpdateCommand : CliCommand<RowsUpdateSettings>
 {
     protected override ExitCodes ExecuteCommand(CommandContext context, RowsUpdateSettings settings, CancellationToken cancellationToken)
     {
-        // --set is required as a domain error rendered per --output, not as
+        // --set is required as a domain error rendered per the output format, not as
         // Spectre parse-error text.
         if (settings.Set is not { Length: > 0 })
         {

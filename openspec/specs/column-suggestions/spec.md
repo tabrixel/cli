@@ -2,12 +2,12 @@
 
 ## Purpose
 
-The `did_you_mean` suggestion algorithm shared by all column-name lookups (`--where`, `--columns`, `--json`, `--set`): what counts as a "close name" and how a suggestion is chosen.
+The `did_you_mean` suggestion algorithm shared by all column-name lookups (`--where`, `--columns`, the JSON record, `--set`): what counts as a "close name" and how a suggestion is chosen.
 
 ## Requirements
 
 ### Requirement: Column lookup with did_you_mean suggestion
-Every column-name lookup (`--where`, `--columns`, `--json`, `--set`) SHALL resolve names by exact, case-sensitive match. On a miss the command SHALL fail with `ColumnNotFound`; when a close name exists, the error message SHALL include a `did you mean '<name>'?` hint and the JSON error details SHALL carry it as `did_you_mean`. When no close name exists, the error SHALL contain no suggestion.
+Every column-name lookup (`--where`, `--columns`, the JSON record, `--set`) SHALL resolve names by exact, case-sensitive match. On a miss the command SHALL fail with `ColumnNotFound`; when a close name exists, the error message SHALL include a `did you mean '<name>'?` hint and the JSON error details SHALL carry it as `did_you_mean`. When no close name exists, the error SHALL contain no suggestion.
 
 #### Scenario: Unknown column with a close name
 - **WHEN** a lookup names `Stats` and the header contains `Status`

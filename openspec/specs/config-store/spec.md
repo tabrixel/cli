@@ -78,8 +78,8 @@ The CLI SHALL provide `tbxl config list` showing all supported keys with their m
 - **THEN** the output shows `spreadsheet-id` (project), `credentials` (global), `sheet` (unset), and both config file paths
 
 ### Requirement: config commands follow output conventions
-The `config set`, `config get`, and `config list` commands SHALL support `--output text|json` like every other command, with data on stdout and errors on stderr.
+The `config set`, `config get`, and `config list` commands SHALL support the global `--json` flag like every other command, with data on stdout and errors on stderr.
 
 #### Scenario: JSON output
-- **WHEN** the user runs `tbxl config list --output json`
+- **WHEN** the user runs `tbxl config list --json`
 - **THEN** stdout contains a single JSON document with snake_case properties

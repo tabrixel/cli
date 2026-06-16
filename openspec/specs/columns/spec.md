@@ -22,8 +22,8 @@ The CLI SHALL provide a `columns` command that lists the column names of the tar
 - **THEN** the command fails with `HeaderInvalid` describing the problem
 
 ### Requirement: Dual output format
-With `--output json` the command SHALL emit a JSON array of column name strings to stdout; with text output it SHALL render a table of column letter (A1) and name.
+With `--json` the command SHALL emit a JSON array of column name strings to stdout; with text output it SHALL render a table of column letter (A1) and name.
 
 #### Scenario: JSON output
-- **WHEN** `tbxl columns <id> --output json` is run
+- **WHEN** `tbxl columns <id> --json` is run
 - **THEN** stdout contains exactly one JSON array of strings

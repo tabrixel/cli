@@ -46,8 +46,8 @@ The README SHALL list every command registered in `Program.cs` (`auth check`, `c
 - **THEN** the example's flags and arguments are accepted by the CLI parser
 
 ### Requirement: README documents output formats and exit codes
-The README SHALL document the `--output text|json` global option, that JSON uses snake_case property names, that data goes to stdout and errors to stderr, and that the process exit code is non-zero on failure.
+The README SHALL document the global `--json` flag (text output is the default; `--json` switches to JSON), that JSON uses snake_case property names, that data goes to stdout and errors to stderr, and that the process exit code is non-zero on failure.
 
 #### Scenario: User scripts against JSON output
 - **WHEN** a user reads the Output section
-- **THEN** it states how to request JSON, the casing convention, and the stdout/stderr split so output can be machine-parsed
+- **THEN** it states how to request JSON with `--json`, the casing convention, and the stdout/stderr split so output can be machine-parsed

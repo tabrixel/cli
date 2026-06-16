@@ -63,5 +63,5 @@ The `auth check` command SHALL report, for each of the three keys, the resolved 
 - **THEN** the output attributes each value to its source (flag / env / project config) and shows which `config.toml` paths were consulted
 
 #### Scenario: Diagnostics in JSON
-- **WHEN** `auth check --output json` runs
+- **WHEN** `auth check --json` runs
 - **THEN** the JSON payload's `sources` object contains a `values` object with the per-key resolved values and sources (`spreadsheet_id`, `sheet`, `credentials`) and a `configs` object with the project and global `config.toml` paths and found flags, all property names in snake_case

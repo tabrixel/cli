@@ -32,10 +32,10 @@ When the conditions match 0 rows the command SHALL write a warning to stderr, de
 - **THEN** stderr carries a warning and the exit code is 2
 
 ### Requirement: Mutation result output
-On success the command SHALL report the affected count and a receipt of the deleted rows. With `--output json`, stdout carries a payload with `matched`, `affected`, `dry_run`, a `rows` array, and the `truncated`/`returned` fields defined by `rows-mutation-receipts`. Each `rows` element SHALL carry `row` (1-based sheet row number per `rows-mutation-receipts`, as it was before the deletion) and `data` — the **full** record of the deleted row in `rows list` shape, serving as a restore receipt. Text output SHALL print the confirmation message plus a per-row summary of the same receipt, capped by the same truncation rule.
+On success the command SHALL report the affected count and a receipt of the deleted rows. With `--json`, stdout carries a payload with `matched`, `affected`, `dry_run`, a `rows` array, and the `truncated`/`returned` fields defined by `rows-mutation-receipts`. Each `rows` element SHALL carry `row` (1-based sheet row number per `rows-mutation-receipts`, as it was before the deletion) and `data` — the **full** record of the deleted row in `rows list` shape, serving as a restore receipt. Text output SHALL print the confirmation message plus a per-row summary of the same receipt, capped by the same truncation rule.
 
 #### Scenario: JSON result carries deleted records
-- **WHEN** `tbxl rows delete <id> --where 'Status=Archived' --yes --output json` matches one row at sheet row 7 with values `Name=Anna`, `Email=anna@x.ru`, `Status=Archived`
+- **WHEN** `tbxl rows delete <id> --where 'Status=Archived' --yes --json` matches one row at sheet row 7 with values `Name=Anna`, `Email=anna@x.ru`, `Status=Archived`
 - **THEN** stdout contains `"affected": 1` and a `rows` element with `"row": 7` and `data` of `{"Name": "Anna", "Email": "anna@x.ru", "Status": "Archived"}`
 
 #### Scenario: Receipt includes all columns

@@ -6,10 +6,11 @@ namespace Tabrixel.Infrastructure;
 
 public class GlobalSettings : CommandSettings
 {
-    [CommandOption("--output <FORMAT>")]
-    [Description("Output format: text (default) or json.")]
-    [DefaultValue(OutputFormat.Text)]
-    public OutputFormat Format { get; set; }
+    [CommandOption("--json")]
+    [Description("Output as JSON instead of human-readable text.")]
+    public bool JsonOutput { get; set; }
+
+    public OutputFormat Format => JsonOutput ? OutputFormat.Json : OutputFormat.Text;
 
     [CommandOption("--credentials <PATH>")]
     [Description("Path to the Google service account JSON key. " +
