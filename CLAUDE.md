@@ -11,7 +11,7 @@ Tabrixel is a .NET 10 CLI application (binary name: `tbxl`) for working with Goo
 ```powershell
 dotnet build                                        # build
 dotnet run --project Tabrixel -- auth check         # run a CLI command
-dotnet run --project Tabrixel -- auth check --output json
+dotnet run --project Tabrixel -- auth check --json
 dotnet publish Tabrixel -r win-x64 -c Release       # self-contained single-file publish
 ```
 
@@ -27,13 +27,13 @@ Commands are registered in `Tabrixel/Program.cs` using Spectre.Console.Cli branc
 
 - **Command base class**: commands inherit `CliCommand<TSettings>` (not Spectre's `Command<T>` directly), where `TSettings : GlobalSettings`. Implement `ExecuteCommand(...)` returning an `ExitCodes` value. The base class converts it to the process exit code and handles all exceptions.
 
-- **Dual output format**: every command supports `--output` (`text` default, or `json`) via `GlobalSettings.Format`. All command output must go through `Renderer.Data(jsonPayload, renderCallback, format)` — pass both a JSON-serializable payload (commands define private `record` payload types) and a Spectre render callback; `Renderer` picks one based on the format. JSON is serialized with snake_case property names. Never write to the console directly.
+- **Dual output format**: every command supports a global boolean `--json` flag (human-readable text is the default) exposed as `GlobalSettings.Format` (`OutputFormat.Json`/`Text`), backed by the `GlobalSettings.JsonOutput` option. All command output must go through `Renderer.Data(jsonPayload, renderCallback, format)` — pass both a JSON-serializable payload (commands define private `record` payload types) and a Spectre render callback; `Renderer` picks one based on the format. JSON is serialized with snake_case property names. Never write to the console directly.
 
-- **Error handling**: throw `CliException(ErrorCode.X, message, optionalDetailsDictionary)` for expected failures. The `CliCommand` base catches it and renders via `Renderer.Error` (respects `--output`, writes to stderr). Unexpected exceptions are wrapped as `ErrorCode.Internal`.
+- **Error handling**: throw `CliException(ErrorCode.X, message, optionalDetailsDictionary)` for expected failures. The `CliCommand` base catches it and renders via `Renderer.Error` (respects `--json`, writes to stderr). Unexpected exceptions are wrapped as `ErrorCode.Internal`.
 
 - Data output goes to stdout, errors to stderr, so JSON output stays machine-parseable.
 
-- **Global options**: `GlobalSettings` defines `--output`, `--credentials`, `--spreadsheet-id`, and `--sheet`. Never read the raw option properties or env variables for these in command code — resolve through `GlobalSettings.ResolveCredentialsPath()` / `ResolveSpreadsheetId()` / `ResolveSheetName()` (or `SpreadsheetSettings.RequireSpreadsheetId()`), which implement the full precedence chain.
+- **Global options**: `GlobalSettings` defines `--json`, `--credentials`, `--spreadsheet-id`, and `--sheet`. Never read the raw option properties or env variables for these in command code — resolve through `GlobalSettings.ResolveCredentialsPath()` / `ResolveSpreadsheetId()` / `ResolveSheetName()` (or `SpreadsheetSettings.RequireSpreadsheetId()`), which implement the full precedence chain.
 
 ### Configuration layer (`Tabrixel/Configuration/`)
 
