@@ -19,23 +19,23 @@ description: Use when reading from or writing to Google Sheets from the command 
 - **`row` in mutation receipts is the 1-based sheet row** (header is row 1), NOT the record's Id and NOT a 0-based offset. First data row is `row` 2.
 - **Three inputs, each with a precedence chain** (first present wins; an explicit empty value stops the chain). The ALL-CAPS names below — `GOOGLE_APPLICATION_CREDENTIALS`, `TBXL_SPREADSHEET_ID`, `TBXL_SHEET` — are environment variables:
   - credentials: `--credentials <path>` → `GOOGLE_APPLICATION_CREDENTIALS` → config `credentials`
-  - spreadsheet: positional `[SPREADSHEET_ID]` (list/describe/columns/update/delete only) → `--spreadsheet-id` → `TBXL_SPREADSHEET_ID` → config `spreadsheet-id`
+  - spreadsheet: `--spreadsheet-id` → `TBXL_SPREADSHEET_ID` → config `spreadsheet-id`
   - sheet: `--sheet <name>` → `TBXL_SHEET` → config `sheet` (omittable only if the doc has exactly one sheet; otherwise `sheet_ambiguous`)
 - **Config is discovered by walking UP from the current directory** (like `.git`): project `.tabrixel/config.toml`, then global `~/.tabrixel/config.toml`. A config in a *subdirectory* of cwd is NOT found. For repeated work, persist with `tbxl config set <key> <value>` (`--global` for the global store) or pass flags every call.
-- `rows add`/`rows upsert` take the **JSON record as the positional argument**, so they have no positional spreadsheet id — give the id via `--spreadsheet-id`/env/config.
+- No command takes the spreadsheet id positionally — always give it via `--spreadsheet-id`/`TBXL_SPREADSHEET_ID`/config. The sole positional argument is the **JSON record** of `rows add`/`rows upsert` (e.g. `rows add '{…}'`).
 
 ## Command quick reference
 
 | Command | Purpose | Key options |
 |---|---|---|
 | `tbxl auth check` | Validate the key; report resolved config + sources | `--spreadsheet-id` also checks access |
-| `tbxl describe [ID]` | All sheets, their columns, record counts | `--sheet` filters to one (ignores env/config sheet default) |
-| `tbxl columns [ID]` | Column names of the target sheet | `--sheet` |
-| `tbxl rows list [ID]` | Read records below the header | `--where`, `--columns`, `--limit` (def 100), `--offset` (def 0) |
+| `tbxl describe` | All sheets, their columns, record counts | `--sheet` filters to one (ignores env/config sheet default) |
+| `tbxl columns` | Column names of the target sheet | `--sheet` |
+| `tbxl rows list` | Read records below the header | `--where`, `--columns`, `--limit` (def 100), `--offset` (def 0) |
 | `tbxl rows add '<json>'` | Append one record | unknown fields rejected; missing fields left empty |
-| `tbxl rows update [ID]` | Set columns on matched rows | `--where` (repeatable, AND), `--set` (≥1, repeatable), `--all`/`--first` |
+| `tbxl rows update` | Set columns on matched rows | `--where` (repeatable, AND), `--set` (≥1, repeatable), `--all`/`--first` |
 | `tbxl rows upsert '<json>'` | Update matches, else insert | `--where` required, `--all`/`--first` |
-| `tbxl rows delete [ID]` | Delete matched rows | `--where`, **`--yes` required**, `--all`/`--first` |
+| `tbxl rows delete` | Delete matched rows | `--where`, **`--yes` required**, `--all`/`--first` |
 | `tbxl config set/get/list` | Manage stored defaults | `set --global` for global store |
 
 Run `tbxl <command> --help` for the full, authoritative flag list — don't guess flags.
@@ -81,14 +81,14 @@ Error `code` values: `internal`, `auth_failed`, `not_found`, `sheet_ambiguous`, 
 ```sh
 # Replace <ID> with the spreadsheet id and <KEY> with the path to the service-account JSON.
 # 1. Learn the real names — never assume them.
-tbxl describe <ID> --credentials <KEY> --json
-tbxl columns <ID> --sheet Users --credentials <KEY> --json
+tbxl describe --spreadsheet-id <ID> --credentials <KEY> --json
+tbxl columns --spreadsheet-id <ID> --sheet Users --credentials <KEY> --json
 # 2. Dry-run the change and read the receipt (row = 1-based sheet row).
-tbxl rows update <ID> --sheet Users --where "Name=Max" --set "IsActive=0" --dry-run --credentials <KEY> --json
+tbxl rows update --spreadsheet-id <ID> --sheet Users --where "Name=Max" --set "IsActive=0" --dry-run --credentials <KEY> --json
 # 3. Commit it (single match → no --all/--first needed).
-tbxl rows update <ID> --sheet Users --where "Name=Max" --set "IsActive=0" --credentials <KEY> --json
+tbxl rows update --spreadsheet-id <ID> --sheet Users --where "Name=Max" --set "IsActive=0" --credentials <KEY> --json
 # 4. Verify against the live sheet.
-tbxl rows list <ID> --sheet Users --where "Name=Max" --credentials <KEY> --json
+tbxl rows list --spreadsheet-id <ID> --sheet Users --where "Name=Max" --credentials <KEY> --json
 ```
 
 `rows add`/`upsert` examples:

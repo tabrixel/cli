@@ -5,9 +5,9 @@ using Tabrixel.Sheets;
 
 namespace Tabrixel.Commands;
 
-public class DescribeCommand : CliCommand<PositionalSpreadsheetSettings>
+public class DescribeCommand : CliCommand<SpreadsheetSettings>
 {
-    protected override ExitCodes ExecuteCommand(CommandContext context, PositionalSpreadsheetSettings settings, CancellationToken cancellationToken)
+    protected override ExitCodes ExecuteCommand(CommandContext context, SpreadsheetSettings settings, CancellationToken cancellationToken)
     {
         var spreadsheetId = settings.RequireSpreadsheetId();
         var client = SheetsServiceFactory.Create(settings);

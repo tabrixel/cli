@@ -4,7 +4,7 @@ using Tabrixel.Infrastructure;
 
 namespace Tabrixel.Commands.Rows;
 
-public class RowsAddSettings : RecordMutationSettings
+public class RowsAddSettings : MutatingSpreadsheetSettings
 {
     [CommandArgument(0, "[JSON]")]
     [Description("Record to add as a JSON object mapping column names to values, " +

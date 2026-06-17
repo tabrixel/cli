@@ -7,7 +7,7 @@ Defining the precedence chain (command line → environment variable → project
 ## Requirements
 
 ### Requirement: Precedence chain per key
-For each of `spreadsheet-id`, `sheet`, and `credentials`, the CLI SHALL resolve the effective value top-down, taking the first level where the value is present: command line (positional argument where supported, then flag) → environment variable → project config → global config. The environment variables SHALL be `TBXL_SPREADSHEET_ID` and `TBXL_SHEET`; credentials use `GOOGLE_APPLICATION_CREDENTIALS`.
+For each of `spreadsheet-id`, `sheet`, and `credentials`, the CLI SHALL resolve the effective value top-down, taking the first level where the value is present: command-line flag → environment variable → project config → global config. The command line SHALL contribute only the corresponding flag (`--spreadsheet-id`, `--sheet`, `--credentials`); no value SHALL be accepted as a positional argument. The environment variables SHALL be `TBXL_SPREADSHEET_ID` and `TBXL_SHEET`; credentials use `GOOGLE_APPLICATION_CREDENTIALS`.
 
 #### Scenario: Flag beats env and config
 - **WHEN** `--spreadsheet-id A` is passed while `TBXL_SPREADSHEET_ID=B` and the config sets `spreadsheet-id = "C"`
@@ -23,7 +23,7 @@ For each of `spreadsheet-id`, `sheet`, and `credentials`, the CLI SHALL resolve 
 
 #### Scenario: Nothing set anywhere
 - **WHEN** `spreadsheet-id` is absent at every level and a command requires it
-- **THEN** the command fails with an `invalid_arguments` error explaining all the ways to set it (argument, flag, env variable, config)
+- **THEN** the command fails with an `invalid_arguments` error explaining all the ways to set it (flag, env variable, config)
 
 ### Requirement: Presence stops the chain, including empty values
 At every level, presence SHALL be determined by the value being non-null; an explicitly provided empty value (after trim) SHALL count as present and stop the chain at that level. The implementation SHALL distinguish `null` (absent) from `string.Empty` (deliberately set empty) and SHALL NOT fall through on empty values.

@@ -14,11 +14,11 @@ The commands `rows add`, `rows update`, `rows delete`, and `rows upsert` SHALL a
 - **THEN** no append request is sent to the API, and the command exits with code 0
 
 #### Scenario: rows update dry run writes nothing
-- **WHEN** `tbxl rows update <id> --where 'Status=Open' --set 'Status=Done' --all --dry-run` matches at least one row
+- **WHEN** `tbxl rows update --spreadsheet-id <id> --where 'Status=Open' --set 'Status=Done' --all --dry-run` matches at least one row
 - **THEN** no cell-update request is sent to the API, and the command exits with code 0
 
 #### Scenario: rows delete dry run writes nothing
-- **WHEN** `tbxl rows delete <id> --where 'Status=Done' --all --dry-run` matches at least one row
+- **WHEN** `tbxl rows delete --spreadsheet-id <id> --where 'Status=Done' --all --dry-run` matches at least one row
 - **THEN** no delete request is sent to the API, and the command exits with code 0
 
 #### Scenario: rows upsert dry run writes nothing
@@ -52,20 +52,20 @@ A dry run SHALL report the same affected-row count and the same receipt fields t
 A dry run SHALL exit with the same code the real run would have: `Success` (0) when the write would happen, `NoMatch` (2) when `--where` matches zero rows for `rows update`/`rows delete`. With `--json`, the zero-match case MUST additionally emit the payload `{"matched": 0, "affected": 0, "dry_run": true, "rows": [], "truncated": false, "returned": 0}` on stderr per `rows-match-reporting`.
 
 #### Scenario: zero matches in dry run
-- **WHEN** `tbxl rows delete <id> --where 'Status=Nope' --all --dry-run` matches no rows with text output
+- **WHEN** `tbxl rows delete --spreadsheet-id <id> --where 'Status=Nope' --all --dry-run` matches no rows with text output
 - **THEN** a warning is written to stderr and the command exits with code 2
 
 #### Scenario: zero matches in dry run with JSON output
-- **WHEN** `tbxl rows delete <id> --where 'Status=Nope' --all --dry-run --json` matches no rows
+- **WHEN** `tbxl rows delete --spreadsheet-id <id> --where 'Status=Nope' --all --dry-run --json` matches no rows
 - **THEN** stderr contains `"matched": 0`, `"affected": 0`, `"dry_run": true`, and `"rows": []`, stdout is empty, and the command exits with code 2
 
 ### Requirement: rows delete dry run does not require --yes
 `rows delete --dry-run` SHALL NOT require the `--yes` confirmation flag, because no deletion occurs. Without `--dry-run`, the `--yes` requirement is unchanged.
 
 #### Scenario: preview delete without confirmation
-- **WHEN** `tbxl rows delete <id> --where 'Status=Done' --all --dry-run` is executed without `--yes`
+- **WHEN** `tbxl rows delete --spreadsheet-id <id> --where 'Status=Done' --all --dry-run` is executed without `--yes`
 - **THEN** the command succeeds and reports the would-be deletion count
 
 #### Scenario: real delete still requires confirmation
-- **WHEN** `tbxl rows delete <id> --where 'Status=Done' --all` is executed without `--yes` and without `--dry-run`
+- **WHEN** `tbxl rows delete --spreadsheet-id <id> --where 'Status=Done' --all` is executed without `--yes` and without `--dry-run`
 - **THEN** the command fails with `ConfirmationRequired` and modifies nothing

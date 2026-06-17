@@ -4,7 +4,7 @@ using Tabrixel.Infrastructure;
 
 namespace Tabrixel.Commands.Rows;
 
-public class RowsUpsertSettings : RecordMutationSettings
+public class RowsUpsertSettings : MutatingSpreadsheetSettings
 {
     [CommandArgument(0, "[JSON]")]
     [Description("Fields to write as a JSON object mapping column names to values, " +

@@ -4,12 +4,13 @@ using Spectre.Console.Cli;
 namespace Tabrixel.Infrastructure;
 
 /// <summary>
-/// Base settings for mutating commands that take a positional spreadsheet ID
-/// (rows update/delete). Record-payload commands (rows add/upsert) use
-/// <see cref="RecordMutationSettings"/> instead, since their positional slot
-/// carries the JSON record.
+/// Single base for all mutating commands (rows add/upsert/update/delete): it adds
+/// the shared <c>--dry-run</c> flag on top of the common spreadsheet-ID/sheet
+/// resolution in <see cref="SpreadsheetSettings"/>. Record-payload commands
+/// (add/upsert) declare their own positional JSON argument; update/delete add
+/// their match options.
 /// </summary>
-public class MutatingSpreadsheetSettings : PositionalSpreadsheetSettings
+public class MutatingSpreadsheetSettings : SpreadsheetSettings
 {
     [CommandOption("--dry-run")]
     [Description("Validate and match against the live sheet but write nothing. " +

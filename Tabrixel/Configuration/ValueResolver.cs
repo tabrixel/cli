@@ -6,9 +6,9 @@ public sealed record ResolvedValue(string? Value, ValueSource Source)
 }
 
 /// <summary>
-/// Implements the precedence chain: argument → flag → env → project config →
-/// global config. Presence at a level is value being non-null; values are
-/// trimmed, and an empty value still stops the chain (deliberate override).
+/// Implements the precedence chain: flag → env → project config → global config.
+/// Presence at a level is value being non-null; values are trimmed, and an empty
+/// value still stops the chain (deliberate override).
 /// </summary>
 public sealed class ValueResolver
 {
@@ -33,13 +33,8 @@ public sealed class ValueResolver
     }
 
     public ResolvedValue Resolve(string configKey, string? environmentVariable,
-        string? flagValue, string? argumentValue = null)
+        string? flagValue)
     {
-        if (argumentValue is not null)
-        {
-            return new ResolvedValue(argumentValue.Trim(), ValueSource.Argument);
-        }
-
         if (flagValue is not null)
         {
             return new ResolvedValue(flagValue.Trim(), ValueSource.Flag);
