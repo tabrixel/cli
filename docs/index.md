@@ -4,22 +4,26 @@ layout: home
 
 hero:
   name: "Tabrixel"
-  text: "CLI for working with Google Sheets"
-  tagline: My great project tagline
+  text: "Google Sheets from the command line"
+  tagline: A CLI (tbxl) that treats a Google Sheet as a table of records — inspect a document, read rows, and add, update, upsert, or delete them by column conditions.
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: Get Started
+      link: /guide/getting-started
     - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: Introduction
+      link: /guide/introduction
+    - theme: alt
+      text: Commands
+      link: /commands/
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: Sheets as records
+    details: Row 1 is the header; every row below is a record keyed by column name. List, add, update, upsert, and delete rows by exact column conditions.
+  - title: Safe by default
+    details: Mutations need a single unambiguous match (or explicit --all/--first), delete refuses without --yes, and --dry-run previews any change before it touches the sheet.
+  - title: Text or JSON output
+    details: Human-readable tables by default, or pass --json for snake_case JSON with data on stdout and errors on stderr — ready to pipe into scripts.
+  - title: Layered configuration
+    details: Resolve credentials, spreadsheet ID, and sheet from flags, environment variables, or project/global TOML config, with a clear precedence chain.
 ---
-
