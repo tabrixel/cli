@@ -13,16 +13,6 @@ This puts the `tbxl` command on your `PATH`. Update it later with:
 dotnet tool update --global Tabrixel
 ```
 
-## Supported platforms
-
-Tabrixel targets .NET 10 and runs anywhere the .NET runtime does. Self-contained
-single-file builds are published for these runtime identifiers (RIDs):
-
-- `win-x64`
-- `win-arm64`
-- `linux-x64`
-- `osx-arm64`
-
 ## Verify the install
 
 Check that the command is available and see its version:

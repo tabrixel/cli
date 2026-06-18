@@ -62,3 +62,23 @@ The site SHALL document the global `--json` flag (text is the default; `--json` 
 #### Scenario: Site builds with no broken internal links
 - **WHEN** `vitepress build docs` is run
 - **THEN** the build succeeds, every `nav`/`sidebar` link resolves to an existing page, and no link references `markdown-examples` or `api-examples`
+
+### Requirement: Installation guide documents the global-tool install only
+
+The installation guide (`docs/guide/installation.md`) SHALL document the .NET global-tool install flow (`dotnet tool install --global Tabrixel`, update, and verify steps) and SHALL NOT contain a "Supported platforms" section or enumerate self-contained single-file build runtime identifiers (e.g. `win-x64`, `win-arm64`, `linux-x64`, `osx-arm64`). Generated site output under `docs/.vitepress/dist/` and the generated `llms.txt`/`llms-full.txt` SHALL likewise be free of that section once rebuilt.
+
+#### Scenario: Installation page omits the platforms section
+
+- **WHEN** the installation guide is inspected after this change
+- **THEN** the heading "Supported platforms" SHALL NOT appear in `docs/guide/installation.md`
+- **AND** the runtime identifiers `win-x64`, `win-arm64`, `linux-x64`, and `osx-arm64` SHALL NOT appear on that page
+
+#### Scenario: Install, update, and verify steps remain
+
+- **WHEN** a user reads the installation guide
+- **THEN** it still shows `dotnet tool install --global Tabrixel`, the `dotnet tool update --global Tabrixel` update step, and the `tbxl --version` verify step
+
+#### Scenario: Rebuilt output is free of the section
+
+- **WHEN** the docs are rebuilt with `vitepress build docs`
+- **THEN** the generated installation page under `docs/.vitepress/dist/` and the generated `llms.txt`/`llms-full.txt` SHALL NOT contain the string "Supported platforms"
