@@ -17,11 +17,11 @@
         <PackageId>Tabrixel</PackageId>
         <Version>0.0.0</Version>
         <Authors>Tabrixel</Authors>
-        <Description>CLI for working with Google Sheets (tbxl).</Description>
+        <Description>A CLI (tbxl) that treats a Google Sheet as a table of records - inspect a document, read rows, and add, update, upsert, or delete them by column conditions</Description>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <Copyright>Copyright (c) 2026 Tabrixel</Copyright>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageProjectUrl>https://github.com/tabrixel/cli</PackageProjectUrl>
+        <PackageProjectUrl>https://tabrixel.com</PackageProjectUrl>
         <RepositoryUrl>https://github.com/tabrixel/cli</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageTags>google-sheets;cli;spreadsheet;dotnet-tool</PackageTags>
