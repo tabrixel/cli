@@ -1,5 +1,6 @@
 ---
 outline: deep
+description: How rows are selected with --where and the mutation guardrails — --all/--first, --yes, --dry-run, and what row means in a receipt.
 ---
 
 # Matching & safety

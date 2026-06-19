@@ -1,3 +1,7 @@
+---
+description: Create a Google service account key, share your spreadsheet with it, point tbxl at the key, and verify access with auth check.
+---
+
 # Getting Started
 
 Tabrixel authenticates with a **Google service account JSON key**. This page

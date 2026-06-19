@@ -1,5 +1,6 @@
 ---
 outline: deep
+description: The default text output versus --json, snake_case keys, the stdout/stderr split, and the JSON shape of each command's response.
 ---
 
 # Output formats

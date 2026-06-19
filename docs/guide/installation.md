@@ -1,3 +1,7 @@
+---
+description: Install, update, and verify the tbxl global tool with the .NET SDK.
+---
+
 # Installation
 
 Tabrixel is distributed as a .NET global tool. With the [.NET SDK](https://dotnet.microsoft.com/)

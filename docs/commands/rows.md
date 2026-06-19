@@ -1,5 +1,6 @@
 ---
 outline: deep
+description: Read, add, update, upsert, and delete sheet rows as records, matched by exact column conditions.
 ---
 
 # rows

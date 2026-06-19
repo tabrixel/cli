@@ -82,3 +82,19 @@ The installation guide (`docs/guide/installation.md`) SHALL document the .NET gl
 
 - **WHEN** the docs are rebuilt with `vitepress build docs`
 - **THEN** the generated installation page under `docs/.vitepress/dist/` and the generated `llms.txt`/`llms-full.txt` SHALL NOT contain the string "Supported platforms"
+
+### Requirement: Documentation pages carry frontmatter descriptions for llms.txt
+
+Every documentation page under `docs/` SHALL define a non-empty `description` field in its frontmatter that summarizes the page in a single sentence. Because the site retains the `vitepress-plugin-llms` plugin, each `description` SHALL appear after the page's link in the generated `llms.txt` index in the form `- [Title](/path.md): <description>`. This requirement covers the home page (`docs/index.md`), the guide pages (`docs/guide/*.md`), the command-reference pages (`docs/commands/*.md`), and the concepts pages (`docs/concepts/*.md`).
+
+#### Scenario: Every source page declares a description
+
+- **WHEN** the `docs/**/*.md` source pages are inspected after this change
+- **THEN** each page — including `docs/index.md` and every page under `docs/guide/`, `docs/commands/`, and `docs/concepts/` — SHALL contain a non-empty frontmatter `description` field
+- **AND** each `description` SHALL describe that specific page's purpose rather than repeating the site-wide description
+
+#### Scenario: Generated llms.txt annotates links with descriptions
+
+- **WHEN** the docs are rebuilt with `vitepress build docs`
+- **THEN** every documentation page that appears as a link in the generated `llms.txt` SHALL be followed by `: <description>` matching that page's frontmatter `description`
+- **AND** no page link in `llms.txt` SHALL appear as a bare link without its description

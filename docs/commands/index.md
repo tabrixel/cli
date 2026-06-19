@@ -1,3 +1,7 @@
+---
+description: Reference for every tbxl command, the global options shared by all of them, and the conventions they follow.
+---
+
 # Commands
 
 `tbxl` is organized into a few top-level commands and two branches (`config` and

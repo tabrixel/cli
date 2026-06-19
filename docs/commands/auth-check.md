@@ -1,3 +1,7 @@
+---
+description: Validate the service account key and report the resolved configuration and where each value came from.
+---
+
 # auth check
 
 Validate the service account key and report the resolved configuration, along

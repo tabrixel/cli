@@ -1,3 +1,7 @@
+---
+description: What Tabrixel is and the records model — row 1 is the header and every row below is a record keyed by column name.
+---
+
 # Introduction
 
 **Tabrixel** (`tbxl`) is a command-line tool for working with Google Sheets as

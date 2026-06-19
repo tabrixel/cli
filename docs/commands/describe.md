@@ -1,3 +1,7 @@
+---
+description: Print an overview of the whole document — every sheet, its columns, and how many records each contains.
+---
+
 # describe
 
 Print an overview of the whole document: every sheet, its columns, and how many

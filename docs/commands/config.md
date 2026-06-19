@@ -1,3 +1,7 @@
+---
+description: Set, get, and list the stored defaults — spreadsheet ID, sheet, and credentials — in project or global config.
+---
+
 # config
 
 Manage default values stored in `.tabrixel/config.toml`. Persisting the

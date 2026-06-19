@@ -1,6 +1,7 @@
 ---
 # https://vitepress.dev/reference/default-theme-home-page
 layout: home
+description: Tabrixel (tbxl) is a command-line tool that treats a Google Sheet as a table of records you can inspect, read, and safely mutate.
 
 hero:
   name: "Tabrixel"

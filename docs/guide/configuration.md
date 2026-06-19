@@ -1,3 +1,7 @@
+---
+description: Resolve credentials, spreadsheet ID, and sheet from flags, environment variables, and TOML config, and the precedence chain between them.
+---
+
 # Configuration
 
 Three inputs drive almost every command — the **credentials path**, the

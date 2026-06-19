@@ -1,3 +1,7 @@
+---
+description: The three process exit codes (0, 1, 2) and the stable error code values tbxl reports on failure.
+---
+
 # Exit codes & errors
 
 `tbxl` is designed to be scripted. Its process exit code tells you the outcome at

@@ -1,3 +1,7 @@
+---
+description: List the exact, case-sensitive column names of the target sheet from its header row.
+---
+
 # columns
 
 List the column names of the target sheet, taken from its header row (row 1).
