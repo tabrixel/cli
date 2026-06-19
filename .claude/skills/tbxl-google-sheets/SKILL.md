@@ -1,6 +1,6 @@
 ---
 name: tbxl-google-sheets
-description: Use when reading from or writing to Google Sheets from the command line, or when a task mentions the tbxl CLI, a Google spreadsheet ID, treating sheet rows as records (list/add/update/upsert/delete), or the GOOGLE_APPLICATION_CREDENTIALS, TBXL_SPREADSHEET_ID, or TBXL_SHEET environment variables.
+description: Use when reading from or writing to Google Sheets from the command line, or when a task mentions the tbxl CLI, a Google spreadsheet ID, setting up Google service-account access to a sheet (sharing a document with the service account), treating sheet rows as records (list/add/update/upsert/delete), or the GOOGLE_APPLICATION_CREDENTIALS, TBXL_SPREADSHEET_ID, or TBXL_SHEET environment variables.
 ---
 
 # Driving the tbxl Google Sheets CLI
@@ -10,6 +10,14 @@ description: Use when reading from or writing to Google Sheets from the command 
 `tbxl` is a globally-installed CLI that treats a Google Sheet as a table of records: row 1 is the header, every row below is a record keyed by column name. Use it to inspect a document and to read/add/update/upsert/delete rows by column conditions.
 
 **Core principle:** the tool already knows its surface — don't re-derive it by trial and error. Learn the exact sheet/column names from `describe`/`columns` first, then act. Column names, sheet names, and `--where`/`--set` values are **exact, case-sensitive strings with no type coercion**.
+
+## Setup & access (the #1 cause of failures)
+
+`tbxl` is a global CLI — confirm it's available with `tbxl --version`. It authenticates as a **Google service account**, which can only see spreadsheets that have been **explicitly shared with its email** — sharing happens in the Google Sheets *Share* dialog, not through `tbxl`.
+
+- Get the service account's address from `tbxl auth check --json` → `service_account_email`.
+- In Google Sheets, **Share** the target document with that email: **Viewer** to read, **Editor** to add/update/delete.
+- A correct spreadsheet id that simply hasn't been shared still fails with `not_found` (403/404), not a clearer "access denied" — see the error notes below.
 
 ## Critical conventions (read before running anything)
 
@@ -37,6 +45,9 @@ description: Use when reading from or writing to Google Sheets from the command 
 | `tbxl rows upsert '<json>'` | Update matches, else insert | `--where` required, `--all`/`--first` |
 | `tbxl rows delete` | Delete matched rows | `--where`, **`--yes` required**, `--all`/`--first` |
 | `tbxl config set/get/list` | Manage stored defaults | `set --global` for global store |
+
+- `rows list --columns` only chooses which columns appear in the **output**; you can still `--where`-filter on a column you left out of `--columns`.
+- `config get`/`config list` report only the **config layer**. To see a value's full resolution across flag → env → config (and which level won), use `auth check`.
 
 Run `tbxl <command> --help` for the full, authoritative flag list — don't guess flags.
 
@@ -74,7 +85,7 @@ Run `tbxl <command> --help` for the full, authoritative flag list — don't gues
 {"code":"invalid_arguments","message":"...","details":null}
 ```
 
-Error `code` values: `internal`, `auth_failed`, `not_found`, `sheet_ambiguous`, `header_invalid`, `column_not_found`, `ambiguous_match`, `confirmation_required`, `invalid_arguments`, `io_error`.
+Error `code` values: `internal`, `auth_failed`, `not_found`, `sheet_ambiguous`, `header_invalid`, `column_not_found`, `ambiguous_match`, `confirmation_required`, `invalid_arguments`, `io_error`. Notable causes: `auth_failed` = key missing, invalid, or unauthorized; `not_found` = wrong/inaccessible spreadsheet id or sheet name, **or the document isn't shared with the service account**; `header_invalid` = the header row (row 1) is missing or malformed.
 
 ## Worked example (the safe mutation workflow)
 
@@ -98,7 +109,7 @@ tbxl rows upsert '{"IsActive":"0"}' --where "Id=7" --spreadsheet-id <ID> --sheet
 ```
 **Shell note (win/linux/osx):** forward-slash paths work everywhere — .NET accepts them on Windows too. Single-quoted JSON works in bash/zsh and PowerShell; Windows `cmd.exe` needs different quoting, so use PowerShell there. To skip repeating `--credentials`/`--spreadsheet-id` on every call, persist them once with `tbxl config set`.
 
-JSON record rules: object of `column → scalar`; unknown column → `column_not_found`; non-scalar value or empty object → `invalid_arguments`; `upsert` requires `--where`, and a column named in both `--where` and the record must carry the same value.
+JSON record rules: a flat object of `column → scalar`. Scalars are coerced to text — a number becomes its plain string (`{"Age":30}` → `"30"`, `1e3` → `"1000"`), `true`/`false` become `"true"`/`"false"`, and `null` clears the cell. **Objects/arrays, an empty `{}`, or a duplicate field** → `invalid_arguments`; unknown column → `column_not_found`. `upsert` requires `--where`, and a column named in both `--where` and the record must carry the same value.
 
 ## Common mistakes
 
@@ -112,7 +123,12 @@ JSON record rules: object of `column → scalar`; unknown column → `column_not
 | `delete` "did nothing" | It needs `--yes`; without it, it refuses (`confirmation_required`). |
 | Expecting numbers/booleans back | All cells are strings (`"0"`, `"true"`). |
 | Expecting auth to "stick" after `auth check` | No session state. Pass `--credentials` + the spreadsheet id on **every** call, or persist them via `config set`/env. |
+| `not_found` even though the spreadsheet id is correct | The document isn't shared with the service account. Get the email from `auth check` and share it in Google Sheets — a distinct cause from a wrong id or sheet name. |
 
 ## Don't re-derive the surface
 
 A capable agent without this skill spends ~9 calls probing `--help` and still misreads `row`. You have the map above: check `describe`/`columns` for names, `--help` only for an exhaustive flag list, then run the real command.
+
+## Further reading
+
+The full reference — every command, flag, concept, and JSON receipt shape — is published as an LLM-friendly index at <https://tabrixel.com/llms.txt>. Reach for it only when this skill and `tbxl <command> --help` don't settle a detail.
