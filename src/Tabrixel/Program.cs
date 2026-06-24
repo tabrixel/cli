@@ -1,9 +1,16 @@
-﻿using Spectre.Console.Cli;
+﻿using System.Text;
+using Spectre.Console.Cli;
 using Tabrixel;
 using Tabrixel.Commands;
 using Tabrixel.Commands.Auth;
 using Tabrixel.Commands.Config;
 using Tabrixel.Commands.Rows;
+
+// Force UTF-8 console output so non-ASCII values (e.g. Cyrillic) are not
+// mangled into '?' by the host's legacy code page. Must run before any output;
+// recreating Console.Out/Error here is inherited by the lazy Renderer/Spectre
+// consoles. BOM-less so --json output stays clean for downstream parsers.
+Console.OutputEncoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
 
 var app = new CommandApp();
 

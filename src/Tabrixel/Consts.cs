@@ -3,7 +3,7 @@ namespace Tabrixel;
 public static class Consts
 {
     public static readonly string ApplicationName = "tbxl";
-    public static readonly string ApplicationVersion = "0.3.1";
+    public static readonly string ApplicationVersion = "0.3.2";
     
     public static readonly string EnvVariablePrefix = "TBXL_";
 

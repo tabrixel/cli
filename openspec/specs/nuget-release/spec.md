@@ -40,11 +40,11 @@ The release workflow SHALL set the published package version from the triggering
 - **THEN** the produced `.nupkg` has package version `0.0.0`
 
 ### Requirement: Publish the tbxl tool package to NuGet.org via Trusted Publishing
-The release workflow SHALL pack the `Tabrixel` project (the packable `tbxl` .NET tool) and push the resulting `.nupkg` to NuGet.org using NuGet.org Trusted Publishing (OIDC), NOT a long-lived API key secret. The publish job SHALL be granted `id-token: write` permission and SHALL exchange the GitHub OIDC token for a short-lived NuGet API key (via the `NuGet/login` action) immediately before pushing. Publishing SHALL be idempotent with respect to already-published versions (a re-run for an existing version SHALL NOT fail the workflow).
+The release workflow SHALL pack the `Tabrixel` project (the packable `tbxl` .NET tool) at its location under the `src/` directory (`src/Tabrixel/Tabrixel.csproj`) and push the resulting `.nupkg` to NuGet.org using NuGet.org Trusted Publishing (OIDC), NOT a long-lived API key secret. The publish job SHALL be granted `id-token: write` permission and SHALL exchange the GitHub OIDC token for a short-lived NuGet API key (via the `NuGet/login` action) immediately before pushing. Publishing SHALL be idempotent with respect to already-published versions (a re-run for an existing version SHALL NOT fail the workflow).
 
 #### Scenario: Successful publish
 - **WHEN** tests pass and a matching Trusted Publishing policy exists on nuget.org
-- **THEN** the workflow obtains a short-lived API key via OIDC and pushes the `Tabrixel` package to NuGet.org
+- **THEN** the workflow obtains a short-lived API key via OIDC and packs `src/Tabrixel/Tabrixel.csproj`, then pushes the `Tabrixel` package to NuGet.org
 
 #### Scenario: No matching trusted publishing policy
 - **WHEN** no nuget.org Trusted Publishing policy matches the repository owner, repository, and `release.yml` workflow file
@@ -57,3 +57,7 @@ The release workflow SHALL pack the `Tabrixel` project (the packable `tbxl` .NET
 #### Scenario: Version already published
 - **WHEN** the package version produced from the tag already exists on NuGet.org
 - **THEN** the push step skips the duplicate without failing the workflow
+
+#### Scenario: Project located under src
+- **WHEN** the publish job runs against the relocated layout where the project lives at `src/Tabrixel/Tabrixel.csproj`
+- **THEN** the pack step resolves the project under `src/` and does not fail with a missing-project error

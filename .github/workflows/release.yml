@@ -18,13 +18,13 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore src/Tabrixel.slnx
 
       - name: Build
-        run: dotnet build --no-restore -c Release
+        run: dotnet build src/Tabrixel.slnx --no-restore -c Release
 
       - name: Test
-        run: dotnet test --no-build -c Release
+        run: dotnet test src/Tabrixel.slnx --no-build -c Release
 
   publish:
     needs: test
@@ -45,7 +45,7 @@ jobs:
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
 
       - name: Pack
-        run: dotnet pack Tabrixel/Tabrixel.csproj -c Release -p:Version=$VERSION -o ./nupkg
+        run: dotnet pack src/Tabrixel/Tabrixel.csproj -c Release -p:Version=$VERSION -o ./nupkg
 
       # Exchanges the GitHub OIDC token for a short-lived (1-hour) NuGet API key via the
       # Trusted Publishing policy configured on nuget.org. Run immediately before push so the
