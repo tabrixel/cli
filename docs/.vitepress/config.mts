@@ -52,5 +52,13 @@ export default defineConfig({
     socialLinks: [
       { icon: 'github', link: 'https://github.com/tabrixel/cli' }
     ]
+  },
+  transformHtml(code) {
+    return code.replace(
+      '</body>',
+      `<script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>` +
+      `<noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif" alt="" referrerpolicy="no-referrer-when-downgrade"/></noscript>` +
+      `</body>`
+    )
   }
 })
