@@ -60,5 +60,8 @@ export default defineConfig({
       `<noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif" alt="" referrerpolicy="no-referrer-when-downgrade"/></noscript>` +
       `</body>`
     )
+  },
+  sitemap: {
+    hostname: 'https://tabrixel.com'
   }
 })

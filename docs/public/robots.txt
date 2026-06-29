@@ -1,0 +1,6 @@
+# Allow all bots
+User-agent: *
+Allow: /
+
+# Link to your sitemap so search engines find it instantly
+Sitemap: https://tabrixel.com
